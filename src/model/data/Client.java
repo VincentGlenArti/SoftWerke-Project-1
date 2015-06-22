@@ -2,9 +2,17 @@ package model.data;
 
 import java.util.*;
 
+/**
+ * Data class for describing client.
+ * 
+ * @version a.2
+ * @author	Boris Gordeev
+ * @since 22-06-2015
+ */
+
 public class Client {
 	
-	static int globalID = 0;
+	private static int globalID = 0;
 	
 	private int id;
 	private String name;
@@ -43,12 +51,13 @@ public class Client {
 	
 	@Override
 	public String toString() {
-		StringBuilder target = new StringBuilder("");
-		target.append(id + ": " + name + " " + lastName + ", orders: %n");
+		StringBuilder returnValue = new StringBuilder("");
+		returnValue.append(id + ": " + name + " " + lastName + " " +
+		birthDate.toString() + ", orders:" + System.lineSeparator());
 		for(int i = 0; i < orders.size(); i++) {
-			target.append(orders.get(i).getID() + "%n");
+			returnValue.append(orders.get(i).getID() + System.lineSeparator());
 		}
-		return target.toString();
+		return returnValue.toString();
 	}
 
 }

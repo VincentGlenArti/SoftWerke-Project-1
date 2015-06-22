@@ -1,11 +1,16 @@
 package main;
 
-import model.data.*;
+import model.Model;
+import view.ConsoleView;
+import controller.InputController;
 
 public class Main {
 
 	public static void main(String[] args) {
-		System.out.println("Hello World!");
+		Model dataModel = new Model();
+		InputController inputController = new InputController(dataModel);
+		ConsoleView view = new ConsoleView(inputController);
+		view.commandLineView();
 	}
 
 }

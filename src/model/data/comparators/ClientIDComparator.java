@@ -4,6 +4,11 @@ import java.util.Comparator;
 
 import model.data.Client;
 
+/**
+ * @version a.1 17 June 2015
+ * @author 	Boris Gordeev
+ */
+
 public class ClientIDComparator implements Comparator<Object> {
 	
 	@Override

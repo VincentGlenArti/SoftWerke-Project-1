@@ -5,6 +5,14 @@ import java.util.*;
 import model.data.*;
 import model.data.comparators.*;
 
+/**
+ * IRepository implemented for "Client" class
+ *
+ * @version a.2
+ * @author	Boris Gordeev
+ * @since 22-06-2015
+ */
+
 public class ClientRepository implements IRepository {
 	
 	private static String clientsType = "clients";
@@ -20,6 +28,33 @@ public class ClientRepository implements IRepository {
 		clients = new ArrayList<Client>();
 	}
 	
+	/**
+	 * Large "and" predicate that check if "comparable" matches search options.
+	 * Ternary expressions are used for "ignoring" null (unspecified in
+	 * attributeTable) search options.
+	 */
+	private boolean matchesRequest(Client comparable, String name, String lastName,
+			Integer id,	Calendar birthDate) {
+		return 	((name == null) ? true : comparable.getName().equals(name)) &&
+				((lastName == null) ? 
+						true : comparable.getLastName().equals(lastName)) &&
+				((id == null) ? true : comparable.getID() == id) &&
+				((birthDate == null) ? true : comparable.getBirthDate().equals(birthDate));
+	}
+	
+	/**
+	 * Finds which comparator to use.
+	 */
+	private void sort(String sortMode, List<Object> sortable) {
+		if (sortMode.equals(nameAttribute)) {
+			Collections.sort(sortable, new ClientNameComparator());
+		} else if (sortMode.equals(idAttribute)) {
+			Collections.sort(sortable, new ClientIDComparator());
+		} else if (sortMode.equals(birthDateAttribute)) {
+			Collections.sort(sortable, new ClientBirthDateComparator());
+		}
+	}
+	
 	@Override
 	public String getDataType() {
 		return clientsType;
@@ -27,33 +62,24 @@ public class ClientRepository implements IRepository {
 	
 	@Override
 	public List<Object> select(HashMap<String, Object> attributeTable) {
-		List<Object> target = new ArrayList<Object>();
+		List<Object> returnValue = new ArrayList<Object>();
 		String name = (String)attributeTable.get(nameAttribute);
 		String lastName = (String)attributeTable.get(lastNameAttribute);
 		Integer id = (Integer)attributeTable.get(idAttribute);
-		String sort = (String)attributeTable.get(sortAttribute);
+		String sortMode = (String)attributeTable.get(sortAttribute);
 		Calendar birthDate = (Calendar)attributeTable.get(birthDateAttribute);
-		Client client;
 		
 		for(int i = 0; i < clients.size(); i++) {
-			client = clients.get(i);
-			if ( ((name == null) ? true : client.getName().equals(name)) &&
-					((lastName == null) ? true : client.getLastName().equals(lastName)) &&
-					((id == null) ? true : client.getID() == id) &&
-					((birthDate == null) ? true : client.getBirthDate().equals(birthDate)) ) {
-				target.add(client);
+			if (matchesRequest(clients.get(i), name, lastName, id, birthDate)) {
+				returnValue.add(clients.get(i));
 			}
 		}
 		
-		if (sort.equals(nameAttribute)) {
-			Collections.sort(target, new ClientNameComparator());
-		} else if (sort.equals(idAttribute)) {
-			Collections.sort(target, new ClientIDComparator());
-		} else if (sort.equals(birthDateAttribute)) {
-			Collections.sort(target, new ClientBirthDateComparator());
+		if (sortMode != null) {
+			sort(sortMode, returnValue);
 		}
 		
-		return target;
+		return returnValue;
 	}
 	
 	@Override
@@ -63,10 +89,21 @@ public class ClientRepository implements IRepository {
 		Calendar birthDate = (Calendar)attributeTable.get(birthDateAttribute);
 		
 		if (name == null || lastName == null || birthDate == null) 
-			throw new IllegalArgumentException(); 
-		Client target = new Client(name, lastName, birthDate);
+			throw new IllegalArgumentException("Not enough attributes"); 
+		Client returnValue = new Client(name, lastName, birthDate);
 		
-		clients.add(target);
+		clients.add(returnValue);
+	}
+	
+	@Override
+	public List<String> getAttributeList() {
+		List<String> returnValue = new ArrayList<String>();
+		returnValue.add(nameAttribute);
+		returnValue.add(lastNameAttribute);
+		returnValue.add(idAttribute);
+		returnValue.add(sortAttribute);
+		returnValue.add(birthDateAttribute);
+		return returnValue;
 	}
 	
 }

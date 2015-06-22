@@ -4,6 +4,11 @@ import java.util.Comparator;
 
 import model.data.Order;
 
+/**
+ * @version a.1 17 June 2015
+ * @author 	Boris Gordeev
+ */
+
 public class OrderIDComparator implements Comparator<Object> {
 	
 	@Override

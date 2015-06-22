@@ -2,6 +2,11 @@ package model.data.comparators;
 
 import java.util.Comparator;
 
+/**
+ * @version a.1 17 June 2015
+ * @author 	Boris Gordeev
+ */
+
 import model.data.Client;
 
 public class ClientBirthDateComparator implements Comparator<Object> {

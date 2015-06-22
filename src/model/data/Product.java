@@ -2,6 +2,14 @@ package model.data;
 
 import java.util.*;
 
+/**
+ * Data class for describing product.
+ * 
+ * @version a.2
+ * @author	Boris Gordeev
+ * @since 22-06-2015
+ */
+
 public class Product implements IService {
 	
 	private static int globalID;
@@ -56,6 +64,6 @@ public class Product implements IService {
 	@Override
 	public String toString() {
 		return productType.toString() + " " + manufacturerName + " " +
-				modelName + " " + color.toString();
+				modelName + " " +  releaseDate.toString() + " " + color.toString();
 	}
 }

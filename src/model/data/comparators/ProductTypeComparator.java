@@ -4,6 +4,11 @@ import java.util.Comparator;
 
 import model.data.Product;
 
+/**
+ * @version a.1 17 June 2015
+ * @author 	Boris Gordeev
+ */
+
 public class ProductTypeComparator implements Comparator<Object> {
 
 	@Override
