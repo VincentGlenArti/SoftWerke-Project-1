@@ -3,8 +3,8 @@ package view;
 import java.util.*;
 import java.io.*;
 
-import controller.InputController;
-import model.data.Client;
+import controller.parsing.InputController;
+import model.data.datatypes.Client;
 
 /**
  * Class used to accept user input and show back formated output.
@@ -88,7 +88,7 @@ public class ConsoleView {
     		continueWorking = false;
     		System.out.println("Goodbye");
     	} else if (commandLineInput.startsWith(userFrienldy, 0)) {
-    		userFriendlyView(commandLineInput);
+    		//userFriendlyView(commandLineInput);
     		System.out.println("Back to console mode");
     	} else {
     		System.out.println("Unknown command");
@@ -100,7 +100,7 @@ public class ConsoleView {
 	 * Finds user matching -uf request, and if it exists, initializes
 	 * UserFriendlyScenario class with it and sends control there.
 	 */
-	private void userFriendlyView(String commandLineInput) {
+	/*private void userFriendlyView(String commandLineInput) {
 		Client user = null;
 		try {
 			String[] split = commandLineInput.split(":");
@@ -115,5 +115,5 @@ public class ConsoleView {
 					new UserFriendlyScenario(controller, user);
 			scenario.commenceScenario();
 		}
-	}
+	}*/
 }

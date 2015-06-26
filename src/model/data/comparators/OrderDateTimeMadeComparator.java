@@ -2,11 +2,12 @@ package model.data.comparators;
 
 import java.util.Comparator;
 
-import model.data.Order;
+import model.data.datatypes.Order;
 
 /**
- * @version a.1 17 June 2015
+ * @version a.1
  * @author 	Boris Gordeev
+ * @since 17.06.2015
  */
 
 public class OrderDateTimeMadeComparator implements Comparator<Object> {

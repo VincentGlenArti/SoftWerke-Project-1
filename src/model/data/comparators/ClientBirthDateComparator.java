@@ -7,7 +7,15 @@ import java.util.Comparator;
  * @author 	Boris Gordeev
  */
 
-import model.data.Client;
+
+
+import model.data.datatypes.Client;
+
+/**
+ * @version a.1
+ * @author 	Boris Gordeev
+ * @since 17.06.2015
+ */
 
 public class ClientBirthDateComparator implements Comparator<Object> {
 	

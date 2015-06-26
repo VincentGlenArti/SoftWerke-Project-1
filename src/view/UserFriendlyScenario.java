@@ -3,9 +3,9 @@ package view;
 import java.io.*;
 import java.util.*;
 
-import model.data.ServiceAmountTuple;
-import model.data.Client;
-import controller.InputController;
+import model.data.auxiliary.ServiceAmountTuple;
+import model.data.datatypes.Client;
+import controller.parsing.InputController;
 
 /**
  * This class is not finished.
