@@ -1,6 +1,7 @@
 package model.data.datatypes;
 
 import java.util.*;
+import model.data.datatypes.factory.*;
 
 /**
  * This class represents an implementation for basic logic for any data type.
@@ -8,22 +9,26 @@ import java.util.*;
  * to derive it from this one, implement it's abstract methods, 
  * and add a new enum for your type in DataTypeEnum.
  * 
- * @version b.1
+ * @version b.2
  * @author	Boris Gordeev
- * @since 22-06-2015
+ * @since 29-06-2015
  */
 
 public abstract class DataType {
 	
-	private Integer primaryKey;
-	private Map<String, Object> propertiesAsMap; 
+	private Number id;
+	private Map<String, Object> propertiesAsMap;
+	private static final Map<DataTypeEnum, Number> globalIDList = 
+			new EnumMap<DataTypeEnum, Number>(DataTypeEnum.class);
 	
 	/**
 	 * Basic constructor, sets primary key and input properties in a way
 	 * so that derived class can use implemented logic.
+	 * Manual ID will be ignore if generateID is true.
 	 */
-	protected DataType(int primaryKey, Map<String, Object> propertiesAsMap) {
-		this.primaryKey = primaryKey;
+	protected DataType(boolean generateID, Number manualID,
+			Map<String, Object> propertiesAsMap) {
+		this.id = (generateID ? setID() : manualID);
 		this.propertiesAsMap = propertiesAsMap;
 	}
 	
@@ -63,14 +68,14 @@ public abstract class DataType {
 	}
 	
 	/**
-	 * Returns true if PK is not null.
+	 * Returns true if ID is not null.
 	 */
-	public boolean hasPrimaryKey() {
-		return primaryKey != null;
+	public boolean hasID() {
+		return id != null;
 	}
 	
-	public Integer getPrimaryKey() {
-		return new Integer(primaryKey);
+	public Number getID() {
+		return new Long(id.longValue());
 	};
 	
 	public Map<String, Object> getPropertiesAsMap() {
@@ -78,9 +83,38 @@ public abstract class DataType {
 	}
 	
 	/**
+	 * Returns factory - means of producing an instance.
+	 */
+	public abstract IFactory getFactory();
+	
+	/**
 	 * Shows which data type derived class responds to.
 	 */
 	public abstract DataTypeEnum getType();
+	
+	/**
+	 * Shows list of property names.
+	 */
+	public abstract List<String> getPropertyNamesAsList();
+	
+	/**
+	 * Shows list of comparators available.
+	 */
+	public abstract Map<String, Comparator<Object>> getComparatorsMap();
+	
+	/**
+	 * Uses global id map to get new id for new instance.
+	 */
+	private Number setID() {
+		if (!globalIDList.containsKey(this.getType())) {
+			globalIDList.put(this.getType(), new Long(1));
+			return new Long(0);
+		} else {
+			Long returnValue = new Long((long)globalIDList.get(this.getType()));
+			globalIDList.put(this.getType(), new Long(returnValue + 1));
+			return returnValue;
+		}
+	}
 	
 	/**
 	 * Javadoc equality obliges to return false if object.equals(null)
@@ -97,15 +131,15 @@ public abstract class DataType {
 		if (comparableTo == this) return true;
 		if (comparableTo == null) return false;
 		if (!comparableTo.getClass().equals(this.getClass())) return false;
-		if (!((DataType)comparableTo).hasPrimaryKey()) return false;
-		if (this.getPrimaryKey() != ((DataType)comparableTo).getPrimaryKey())
-			return false;
-		return true;
+		if (!((DataType)comparableTo).hasID()) return false;
+		if (this.getID().equals(((DataType)comparableTo).getID()))
+			return true;
+		return false;
 	}
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.getPrimaryKey());
+		return Objects.hash(this.getID());
 	}
 
 }

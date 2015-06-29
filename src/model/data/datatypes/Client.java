@@ -1,87 +1,79 @@
 package model.data.datatypes;
 
 import java.util.*;
+import model.data.datatypes.factory.*;
+import model.data.comparators.*;
 
 /**
  * Data class for describing client.
  * 
- * @version b.1
+ * @version b.2
  * @author	Boris Gordeev
- * @since 22-06-2015
+ * @since 29-06-2015
  */
 
-public class Client extends DataType {
+public final class Client extends DataType {
 	
-	private static int globalID = 0;
 	private static final List<String> propertyNamesAsList =
 			Collections.unmodifiableList(new ArrayList<String>() {{
 				add("name");
 				add("lastName");
 				add("birthDate");
 			}});
+	private static final Map<String, Comparator<Object>> comparatorsMap =
+			Collections.unmodifiableMap(new HashMap<String, 
+					Comparator<Object>>() {{
+				put("ID", new IDComparator());
+				put("birthDate", new ClientBirthDateComparator());
+				put("name", new ClientNameComparator());
+			}});
 	
 	private String name;
 	private String lastName;
 	private List<Order> orders;
-	private Calendar birthDate;
-	
-	/**
-	 * Default constructor.
-	 * Does not allow null input.
-	 * Sets primary key.
-	 * 
-	 * @throws IllegalArgumentException
-	 */
-	public Client(String name, String lastName, Calendar birthDate)
-		throws IllegalArgumentException {
-		super(globalID, setPropertiesAsMap(name, lastName, birthDate));
-		if (name == null || lastName == null || birthDate == null)
-			throw new IllegalArgumentException();
+	private Date birthDate;
+
+	private Client(boolean generateID,
+			String name, String lastName,
+			Date birthDate, Number manualID) {
+		super(generateID, manualID, setPropertiesAsMap(name, lastName, birthDate));
 		this.name = name;
 		this.lastName = lastName;
 		this.birthDate = birthDate;
-		orders = new ArrayList<Order>();
-		globalID++;
+		this.orders = new ArrayList<Order>();
 	}
 	
 	/**
-	 * Nullable constructor. Use to build object that you are going to use
-	 * to compare with.
-	 * Allows null input.
-	 * Manual primary key.
-	 */
-	public Client(String name, String lastName, Calendar birthDate, Integer id) {
-		super(id, setPropertiesAsMap(name, lastName, birthDate));
-		this.name = name;
-		this.lastName = lastName;
-		this.birthDate = birthDate;
-	}
-	
-	/**
-	 * Copy constructor.
-	 * Throws an exception if "addItem" has any null fields, which is checked
-	 * using "hasNullProperties". Throws an exception if so.
-	 * Sets primary key.
+	 * Constructs a new instance of this class.
+	 * If generateID is true, manualID will be ignored.
+	 * if generateID is true but any input parameters besides manualID
+	 * are null, then an exception will be thrown.
 	 * 
 	 * @throws IllegalArgumentException
 	 */
-	public Client(Client addItem) throws IllegalArgumentException {
-		super(globalID, setPropertiesAsMap(addItem.getName(), 
-				addItem.getLastName(), addItem.getBirthDate()));
-		if (addItem.hasNullProperties()) throw new IllegalArgumentException();
-		this.name = addItem.getName();
-		this.lastName = addItem.getLastName();
-		this.birthDate = addItem.getBirthDate();
-		orders = new ArrayList<Order>();
-		globalID++;
+	public static Client getInstance(boolean generateID, 
+			String name, String lastName,
+			Date birthDate, Number manualID)
+			throws IllegalArgumentException {
+		if (generateID) {
+			if (name == null ||
+					lastName == null ||
+					birthDate == null) {
+				throw new IllegalArgumentException("ID will be " +
+					"generated only if all required fields are not null");
+			}
+		}
+		
+		
+		return new Client(generateID, name, lastName, birthDate, manualID);
 	}
 	
 	/**
 	 * Returns a map<key, value> object, where "key" is
 	 * supplied property name and "value" is supplied property value.
 	 */
-	private static Map<String, Object> setPropertiesAsMap(final String name, 
-			final String lastName, final Calendar birthDate) {
+	private final static Map<String, Object> setPropertiesAsMap(final String name, 
+			final String lastName, final Date birthDate) {
 		return Collections.unmodifiableMap(
 			new HashMap<String, Object>(){{ 
 				put("name", name);
@@ -90,7 +82,7 @@ public class Client extends DataType {
 		}});
 	}
 	
-	public Calendar getBirthDate() {
+	public Date getBirthDate() {
 		return birthDate;
 	}
 
@@ -106,19 +98,29 @@ public class Client extends DataType {
 		return orders;
 	}
 	
+	public final IFactory getFactory() {
+		return new ClientFactory();
+	}
+	
+	@Override
+	public final Map<String, Comparator<Object>> getComparatorsMap() {
+		return comparatorsMap;
+	}
+	
 	@Override
 	public final DataTypeEnum getType() {
 		return DataTypeEnum.Client;
 	}
 	
-	public final static List<String> getPropertyNamesAsList() {
+	@Override
+	public final List<String> getPropertyNamesAsList() {
 		return propertyNamesAsList;
 	}
 	
 	@Override
 	public String toString() {
 		StringBuilder returnValue = new StringBuilder("");
-		returnValue.append(super.getPrimaryKey())
+		returnValue.append(super.getID())
 			.append(": ")
 			.append(name)
 			.append(" ")
@@ -128,7 +130,7 @@ public class Client extends DataType {
 			.append(", orders:")
 			.append(System.lineSeparator());
 		for(int i = 0; i < orders.size(); i++) {
-			returnValue.append(orders.get(i).getPrimaryKey())
+			returnValue.append(orders.get(i).getID())
 				.append(System.lineSeparator());
 		}
 		return returnValue.toString();

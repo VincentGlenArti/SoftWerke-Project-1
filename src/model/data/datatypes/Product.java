@@ -2,21 +2,20 @@ package model.data.datatypes;
 
 import java.util.*;
 
-import model.data.auxiliary.ColorDiscrete;
-import model.data.auxiliary.ProductType;
-import model.data.auxiliary.ServiceType;
+import model.data.auxiliary.*;
+import model.data.comparators.*;
+import model.data.datatypes.factory.*;
 
 /**
  * Data class for describing product.
  * 
- * @version b.1
+ * @version b.2
  * @author	Boris Gordeev
- * @since 25-06-2015
+ * @since 29-06-2015
  */
 
-public class Product extends DataType implements IService {
+public final class Product extends DataType implements IService {
 	
-	private static int globalID;
 	private static final List<String> propertyNamesAsList =
 			Collections.unmodifiableList(new ArrayList<String>() {{
 				add("manufacturerName"); 
@@ -25,49 +24,26 @@ public class Product extends DataType implements IService {
 				add("color"); 
 				add("productType");
 			}});
+	private static final Map<String, Comparator<Object>> comparatorsMap =
+			Collections.unmodifiableMap(new HashMap<String, 
+					Comparator<Object>>() {{
+				put("ID", new IDComparator());
+				put("manufacturerName", new ProductManufacturerComparator());
+				put("releaseDate", new ProductReleaseDateComparator());
+				put("productType", new ProductTypeComparator());
+				put("modelName", new ProductNameComparator());
+			}});
 	
 	private String manufacturerName;
 	private ProductType productType;
 	private String modelName;
 	private ColorDiscrete color;
-	private Calendar releaseDate;
+	private Date releaseDate;
 	
-	/**
-	 * Default constructor.
-	 * Does not allow null input.
-	 * Sets primary key.
-	 * 
-	 * @throws IllegalArgumentException
-	 */
-	public Product(String manufacturerName, ProductType productType,
-			String modelName, ColorDiscrete color, Calendar releaseDate)
-			throws IllegalArgumentException {
-		super(globalID, setPropertiesAsMap(manufacturerName, productType,
-				modelName, color, releaseDate));
-		if (
-				manufacturerName == null ||
-				productType == null ||
-				modelName == null ||
-				color == null ||
-				releaseDate == null)
-			throw new IllegalArgumentException();
-		this.manufacturerName = manufacturerName;
-		this.productType = productType;
-		this.modelName = modelName;
-		this.color = color;
-		this.releaseDate = releaseDate;
-		globalID++;
-	}
-	
-	/**
-	 * Nullable constructor. Use to build object that you are going to use
-	 * to compare with.
-	 * Allows null input.
-	 * Manual primary key.
-	 */
-	public Product(Integer id, String manufacturerName, ProductType productType,
-			String modelName, ColorDiscrete color, Calendar releaseDate){
-		super(id, setPropertiesAsMap(manufacturerName, productType,
+	private Product(boolean generateID, Number manualID,
+			String manufacturerName, ProductType productType,
+			String modelName, ColorDiscrete color, Date releaseDate) {
+		super(generateID, manualID , setPropertiesAsMap(manufacturerName, productType,
 				modelName, color, releaseDate));
 		this.manufacturerName = manufacturerName;
 		this.productType = productType;
@@ -77,38 +53,41 @@ public class Product extends DataType implements IService {
 	}
 	
 	/**
-	 * Copy constructor.
-	 * Throws an exception if "addItem" has any null fields, which is checked
-	 * using "hasNullProperties". Throws an exception if so.
-	 * Sets primary key.
+	 * Constructs a new instance of this class.
+	 * If generateID is true, manualID will be ignored.
+	 * if generateID is true but any input parameters besides manualID
+	 * are null, then an exception will be thrown.
 	 * 
 	 * @throws IllegalArgumentException
 	 */
-	public Product(Product addItem) throws IllegalArgumentException {
-		super(globalID, setPropertiesAsMap(
-				addItem.getManufacturerName(),
-				addItem.getProductType(),
-				addItem.getModelName(),
-				addItem.getColor(),
-				addItem.getReleaseDate()));
-		if (addItem.hasNullProperties()) throw new IllegalArgumentException();
-		this.manufacturerName = addItem.getManufacturerName();
-		this.productType = addItem.getProductType();
-		this.modelName = addItem.getModelName();
-		this.color = addItem.getColor();
-		this.releaseDate = addItem.getReleaseDate();
-		globalID++;
+	public static Product getInstance(boolean generateID, 
+			Number manualID, String manufacturerName,
+			ProductType productType, String modelName, ColorDiscrete color,
+			Date releaseDate) throws IllegalArgumentException {
+		if (generateID) {
+			if (manufacturerName == null ||
+					productType == null ||
+					modelName == null ||
+					color == null ||
+					releaseDate == null) {
+				throw new IllegalArgumentException("ID will be " +
+					"generated only if all required fields are not null");
+			}
+		}
+		
+		
+		return new Product(generateID, manualID, manufacturerName, productType,
+				modelName, color, releaseDate);
 	}
-	
 	
 	/**
 	 * Returns a map<key, value> object, where "key" is
 	 * supplied property name and "value" is supplied property value.
 	 */
-	private static Map<String, Object> setPropertiesAsMap(
+	private final static Map<String, Object> setPropertiesAsMap(
 			final String manufacturerName, final ProductType productType,
 			final String modelName, final ColorDiscrete color, 
-			final Calendar releaseDate) {
+			final Date releaseDate) {
 		return Collections.unmodifiableMap(
 			new HashMap<String, Object>(){{ 
 				put("manufacturerName", manufacturerName);
@@ -119,7 +98,7 @@ public class Product extends DataType implements IService {
 		}});
 	}
 	
-	public Calendar getReleaseDate() {
+	public Date getReleaseDate() {
 		return releaseDate;
 	}
 	
@@ -139,7 +118,18 @@ public class Product extends DataType implements IService {
 		return productType;
 	}
 	
-	public static final List<String> getPropertyNamesAsList() {
+	@Override
+	public final Map<String, Comparator<Object>> getComparatorsMap() {
+		return comparatorsMap;
+	}
+	
+	@Override
+	public final IFactory getFactory() {
+		return new ProductFactory();
+	}
+	
+	@Override
+	public final List<String> getPropertyNamesAsList() {
 		return propertyNamesAsList;
 	}
 	

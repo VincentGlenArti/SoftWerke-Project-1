@@ -4,7 +4,6 @@ import java.util.*;
 import java.io.*;
 
 import controller.parsing.InputController;
-import model.data.datatypes.Client;
 
 /**
  * Class used to accept user input and show back formated output.
@@ -40,7 +39,7 @@ public class ConsoleView {
 	        	commandLineInput = bs.readLine();
 	    		if(commandLineInput.length() == 0)
 	    			throw new IOException("Empty comand passed");
-	        } catch (IOException io) {
+	        } catch (Exception io) {
 	            System.out.println("Wrong input");
 	            continue;
 	        }
@@ -60,17 +59,17 @@ public class ConsoleView {
 	 */
 	private void sendInputToController(String commandLineInput) {
         List<Object> output = new ArrayList<Object>();
-        try {
+        //try {
         	output = controller.modelOperation(commandLineInput);
 	        for(int i = 0; i < output.size(); i++) {
 	        	System.out.println(output.get(i));
 	        }
         	System.out.println("Done!");
-        } catch (IllegalArgumentException iae) {
-        	System.out.println(iae.getMessage());
-        } catch (Exception e) {
-        	System.out.println("Unknown error");
-        }
+        //} catch (IllegalArgumentException iae) {
+        	//System.out.println(iae.getMessage());
+        //} catch (Exception e) {
+        	//System.out.println("Unknown error");
+        //}
 	}
 	
 	/**

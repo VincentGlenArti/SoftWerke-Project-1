@@ -1,9 +1,9 @@
 package view;
 
 import java.io.*;
-import java.util.*;
+//import java.util.*;
 
-import model.data.auxiliary.ServiceAmountTuple;
+//import model.data.auxiliary.ServiceAmountTuple;
 import model.data.datatypes.Client;
 import controller.parsing.InputController;
 
@@ -20,8 +20,8 @@ public class UserFriendlyScenario {
 	
 	private static String exitCommand = "-exit";
 	private static String helpCommand = "-help";
-	private static String cartCommand = "-cart";
-	private static String buyCommand = "-buy";
+	//private static String cartCommand = "-cart";
+	//private static String buyCommand = "-buy";
 	
 	private static String idAttribute = "id";
 	private static String sortAttribute = "sort";
@@ -31,23 +31,23 @@ public class UserFriendlyScenario {
 	private static String productTypeAttribute = "productType";
 	private static String releaseDateAttribute = "releaseDate";
 	
-	private List<ServiceAmountTuple> cart;
-	private InputController controller;
+	//private List<ServiceAmountTuple> cart;
+	//private InputController controller;
 	private Client user;
 	
-	private String id = "";
-	private String manufacturerName = "";
-	private String modelName = "";
-	private String color = "";
-	private String productType = "";
-	private String releaseDate = "";
-	private String sort = "";
+	//private String id = "";
+	//private String manufacturerName = "";
+	//private String modelName = "";
+	//private String color = "";
+	//private String productType = "";
+	//private String releaseDate = "";
+	//private String sort = "";
 	
 	
 	public UserFriendlyScenario(InputController controller, Client user) {
-		this.controller = controller;
+		//this.controller = controller;
 		this.user = user;
-		cart = new ArrayList<ServiceAmountTuple>();
+		//cart = new ArrayList<ServiceAmountTuple>();
 	}
 	
 	public void commenceScenario() {
@@ -118,9 +118,9 @@ public class UserFriendlyScenario {
 		}
 	}
 	
-	private void showActiveQuerry() {
+	/*private void showActiveQuerry() {
 		
-	}
+	}*/
 	
 	private void showAttributes() {
 		System.out.println("Here are usable attributes:");
@@ -133,12 +133,12 @@ public class UserFriendlyScenario {
 		System.out.println(releaseDateAttribute);
 	}
 	
-	private void showCart() {
+	/*private void showCart() {
 		if (cart.isEmpty()) System.out.println("Your cart is empty");
 		else {
 			for(int i = 0; i < cart.size(); i++) {
 				System.out.println(cart.get(i));
 			}
 		}
-	}
+	}*/
 }

@@ -4,20 +4,26 @@ import java.util.*;
 
 import model.data.datatypes.*;
 import model.storing.DataStorage;
-import controller.datatypeproduction.*;
+
+/**
+ * IOperation for adding.
+ * 
+ * @version b.2
+ * @author	Boris Gordeev
+ * @since 29-06-2015
+ */
 
 public class Add implements IOperation {
 
 	@Override
 	public final OperationEnum getType() {
-		return OperationEnum.Select;
+		return OperationEnum.Add;
 	}
 	
 	@Override
-	public List<Object> perform(Map<String, String> mappedArguments, 
-			DataTypeEnum targetDataType, DataStorage dataStorage) {
-		DataTypeFactory factory = new DataTypeFactory();
-		dataStorage.add(factory.produceDataType(mappedArguments, targetDataType));
+	public List<Object> perform(DataType targetDataType,
+			DataStorage dataStorage, Map<String, Object> additionalParameters) {
+		dataStorage.add(targetDataType);
 		return new ArrayList<Object>();
 	}
 	

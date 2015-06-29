@@ -1,6 +1,5 @@
 package main;
 
-import model.data.datatypes.DataTypeEnum;
 import model.storing.DataStorage;
 import view.ConsoleView;
 import controller.parsing.InputController;

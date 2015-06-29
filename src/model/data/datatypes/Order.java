@@ -2,90 +2,73 @@ package model.data.datatypes;
 
 import java.util.*;
 
+import model.data.comparators.*;
+import model.data.datatypes.factory.*;
 import model.data.auxiliary.ServiceAmountTuple;
 
 /**
  * Data class for describing order.
  * 
- * @version b.1
+ * @version b.2
  * @author	Boris Gordeev
- * @since 25-06-2015
+ * @since 29-06-2015
  */
 
-public class Order extends DataType {
+public final class Order extends DataType {
 	
-	private static int globalID = 0;
 	private static final List<String> propertyNamesAsList =
 			Collections.unmodifiableList(new ArrayList<String>() {{
 				add("dateTimeMade"); 
 				add("client");
+				add("services");
+			}});
+	private static final Map<String, Comparator<Object>> comparatorsMap =
+			Collections.unmodifiableMap(new HashMap<String, 
+					Comparator<Object>>() {{
+				put("ID", new IDComparator());
+				put("dateTimeMade", new OrderDateTimeMadeComparator());
+				put("client", new OrderUserIDComparator());
 			}});
 	
 	private DataType client;
-	private Calendar dateTimeMade;
+	private Date dateTimeMade;
 	private List<ServiceAmountTuple> services;
 	
-	/**
-	 * Default constructor.
-	 * Does not allow null input.
-	 * Sets primary key.
-	 * 
-	 * @throws IllegalArgumentException
-	 */
-	public Order(Client client, List<ServiceAmountTuple> services) 
-		throws IllegalArgumentException {
-		super(globalID, setPropertiesAsMap(Calendar.getInstance(), client));
-		
-		if (client == null || services == null) 
-			throw new IllegalArgumentException();
-		
-		this.client = client;
-		this.dateTimeMade = (Calendar)this.getPropertiesAsMap().
-				get("dateTimeMade");
-		this.services = services;
-		
-		globalID++;
-	}
-	
-	/**
-	 * Nullable constructor. Use to build object that you are going to use
-	 * to compare with.
-	 * Allows null input.
-	 * Manual primary key.
-	 */
-	public Order(Integer id, Client client, Calendar dateTimeMade)  {
-		super(id, setPropertiesAsMap(dateTimeMade, client));
+	private Order(boolean generateID, Number manualID, Client client,
+			Date dateTimeMade, List<ServiceAmountTuple> services)  {
+		super(generateID, manualID, setPropertiesAsMap(dateTimeMade, client));
 		this.client = client;
 		this.dateTimeMade = dateTimeMade;
+		this.services = services;
 	}
 	
 	/**
-	 * Copy constructor.
-	 * Throws an exception if "addItem" has any null fields, which is checked
-	 * using "hasNullProperties". Throws an exception if so.
-	 * Sets primary key.
+	 * Constructs a new instance of this class.
+	 * If generateID is true, manualID will be ignored.
+	 * if generateID is true but any input parameters besides manualID
+	 * are null, then an exception will be thrown.
 	 * 
 	 * @throws IllegalArgumentException
 	 */
-	public Order(Order addItem) throws IllegalArgumentException {
-		super(globalID, setPropertiesAsMap(addItem.getDateTimeMade(),
-				addItem.getClient()));
+	public static Order getInstance(boolean generateID, 
+			Number manualID, Client client, 
+			Date dateTimeMade, List<ServiceAmountTuple> services) 
+					throws IllegalArgumentException {
+		if (generateID) {
+			if (client == null ||
+					dateTimeMade == null ||
+					services == null) {
+				throw new IllegalArgumentException("ID will be " +
+					"generated only if all required fields are not null");
+			}
+		}
 		
-		if (addItem.hasNullProperties()) throw new IllegalArgumentException();
 		
-		this.client = addItem.getClient();
-		this.dateTimeMade = addItem.getDateTimeMade();
-		this.services = addItem.getServices();
-		
-		globalID++;
+		return new Order(generateID, manualID, client, dateTimeMade, services);
 	}
 	
-	/**
-	 * Returns a map<key, value> object, where "key" is
-	 * supplied property name and "value" is supplied property value.
-	 */
-	private static Map<String, Object> setPropertiesAsMap(
-			final Calendar dateTimeMade, final DataType client) {
+	private final static Map<String, Object> setPropertiesAsMap(
+			final Date dateTimeMade, final DataType client) {
 		return Collections.unmodifiableMap(
 			new HashMap<String, Object>(){{ 
 				put("dateTimeMade", dateTimeMade);
@@ -97,7 +80,7 @@ public class Order extends DataType {
 		return services;
 	}
 
-	public Calendar getDateTimeMade() {
+	public Date getDateTimeMade() {
 		return dateTimeMade;
 	}
 	
@@ -106,20 +89,31 @@ public class Order extends DataType {
 	}
 	
 	@Override
+	public final Map<String, Comparator<Object>> getComparatorsMap() {
+		return comparatorsMap;
+	}
+	
+	@Override
+	public final IFactory getFactory() {
+		return new OrderFactory();
+	}
+	
+	@Override
 	public final DataTypeEnum getType() {
 		return DataTypeEnum.Order;
 	}
 	
-	public final static List<String> getPropertyNamesAsList() {
+	@Override
+	public final List<String> getPropertyNamesAsList() {
 		return propertyNamesAsList;
 	}
 	
 	@Override
 	public String toString() {
 		StringBuilder returnValue = new StringBuilder("");
-		returnValue.append(this.getPrimaryKey())
+		returnValue.append(this.getID())
 			.append(" : ")
-			.append(client.getPrimaryKey())
+			.append(client.getID())
 			.append(" ")
 			.append(" ")
 			.append(dateTimeMade.toString())

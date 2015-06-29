@@ -6,19 +6,19 @@ import model.data.datatypes.*;
 import model.storing.DataStorage;
 
 /**
- * IOperation for "Select" - an operation that searches for data types
- * that soft-match specified instance.
+ * IOperation for "get by primary key" - an operation that searches for a
+ * single instance of the specified data type that has a specified ID.
  * 
  * @version b.2
  * @author	Boris Gordeev
  * @since 29-06-2015
  */
 
-public class Select implements IOperation {
-	
+public class GetByID implements IOperation {
+
 	@Override
 	public final OperationEnum getType() {
-		return OperationEnum.Select;
+		return OperationEnum.GetByID;
 	}
 	
 	@Override
@@ -26,14 +26,13 @@ public class Select implements IOperation {
 			DataStorage dataStorage, Map<String, Object> additionalParameters) {
 		List<Object> returnValue = new ArrayList<Object>();
 		
-		if (additionalParameters.containsKey("sort")) {
-			returnValue.addAll(dataStorage.select(targetDataType,
-					(Comparator<Object>)additionalParameters.get("comparator")));
-		} else {
-			returnValue.addAll(dataStorage.select(targetDataType));
-		}
+		DataType result = dataStorage.getByID(targetDataType);
 		
+		if (result != null) {
+			returnValue.add(result);	
+		}
+				
 		return returnValue;
 	}
-
+	
 }

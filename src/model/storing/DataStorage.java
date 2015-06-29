@@ -1,6 +1,5 @@
 package model.storing;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import model.data.datatypes.DataType;
@@ -9,44 +8,21 @@ import model.data.datatypes.DataTypeEnum;
 /**
  * Manages data types.
  * 
- * @version b.1
+ * @version b.2
  * @author	Boris Gordeev
- * @since 22-06-2015
+ * @since 29-06-2015
  */
 
 public class DataStorage {
 
 	private Map<DataTypeEnum, List<DataType>> storedData;
-	private Map<DataTypeEnum, List<String>> propertyNamesLists;
 	
-	/**
-	 * This will use reflecting on every Enum in DataTypeEnum.
-	 * You need to make sure that every DataTypeEnum has a class
-	 * with same name that has a static "getPropertyNamesAsList"
-	 * method that returns a list of property names.
-	 */
 	public DataStorage() {
 		storedData = Collections.synchronizedMap(
 				new EnumMap<DataTypeEnum, List<DataType>>(DataTypeEnum.class));
-		propertyNamesLists = Collections.synchronizedMap(
-				new EnumMap<DataTypeEnum, List<String>>(DataTypeEnum.class));
-		List<String> propertyNamesList;
-		for(DataTypeEnum type : DataTypeEnum.values()) {
-			storedData.put(type, new LinkedList<DataType>());
-			try {
-				propertyNamesList = (List<String>)Class
-					.forName(DataType.class.getPackage().getName()
-							+ "." + type.toString())
-					.getDeclaredMethod("getPropertyNamesAsList", null)
-					.invoke(null, null);
-			} catch (InvocationTargetException | 
-					IllegalAccessException |
-					NoSuchMethodException |
-					ClassNotFoundException Exc) {
-				propertyNamesList = new ArrayList<String>();
-				propertyNamesList.add("No properties info available");
-			}
-			propertyNamesLists.put(type, propertyNamesList);
+		
+		for(DataTypeEnum typeUsed : DataStorageInfo.dataTypesUsed.keySet()) {
+			storedData.put(typeUsed, new ArrayList<DataType>());
 		}
 	}
 	
@@ -108,8 +84,8 @@ public class DataStorage {
 	 */
 	public void add(DataType adable) throws IllegalArgumentException {
 		if(adable.hasNullProperties() ||
-				adable.hasPrimaryKey() ||
-				getByPrimaryKey(adable) != null) 
+				!adable.hasID() ||
+				getByID(adable) != null) 
 			throw new IllegalArgumentException("Addable must have all " +
 				"properties defined and an individual primary key");
 		
@@ -124,9 +100,9 @@ public class DataStorage {
 	 * @return DataType firstOrDefault
 	 * @throws IllegalArgumentException
 	 */
-	public DataType getByPrimaryKey(DataType comparableTo) 
+	public DataType getByID(DataType comparableTo) 
 			throws IllegalArgumentException {
-		if (!comparableTo.hasPrimaryKey()) 
+		if (!comparableTo.hasID()) 
 			throw new IllegalArgumentException("must have primary key defined.");
 		
 		for(DataType comparable : storedData.get(comparableTo.getType())) {
@@ -136,23 +112,6 @@ public class DataStorage {
 		}
 		
 		return null;
-	}
-	
-	/**
-	 * Returns list of properties that must be specified for search purposes
-	 * of specified data type.
-	 * 
-	 * @param DataTypeEnum requestedDataType
-	 * @return List<String> listOfPropertieNames
-	 * @throws IllegalArgumentException
-	 */
-	public List<String> getPropertyNamesList(DataTypeEnum requestedDataType)
-			throws IllegalArgumentException {
-		if(requestedDataType == null) 
-			throw new IllegalArgumentException("Null request");
-		
-		
-		return propertyNamesLists.get(requestedDataType);
 	}
 	
 }

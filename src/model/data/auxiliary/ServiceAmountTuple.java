@@ -15,7 +15,7 @@ public class ServiceAmountTuple {
 	private IService service;
 	private int amount;
 	
-	public ServiceAmountTuple(IService service, int amount ) {
+	public ServiceAmountTuple(IService service, int amount) {
 		this.service = service;
 		this.amount = amount;
 	}
