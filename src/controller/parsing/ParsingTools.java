@@ -1,20 +1,21 @@
 package controller.parsing;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import model.data.auxiliary.*;
 import model.data.datatypes.IService;
-
-import java.util.regex.Pattern;
+import exceptions.*;
 
 /**
  * A "static" class that contains only useful boilerplate functions for
  * parsing strings into specific data. Captures standard exceptions and
  * instead returns ones that would make sense to user.
  * 
- * @version b.2
+ * @version b.3
  * @author	Boris Gordeev
- * @since 29-06-2015
+ * @since 02-07-2015
  */
 
 public final class ParsingTools {
@@ -24,13 +25,15 @@ public final class ParsingTools {
 	 * if null input specified and throws an exception if input is
 	 * unrecognized.
 	 */
-	public static <E extends Enum<E>> E parseEnum(String input, Class<E> targetEnum) {
+	public static <E extends Enum<E>> E parseEnum(String input, Class<E> targetEnum) 
+		throws WrongConsoleInputException {
 		if (input == null) return null;
 		E returnValue = null;
 		try {
 			returnValue = Enum.valueOf(targetEnum, input);
 		} catch (Exception e) {
-			throw new IllegalArgumentException("Unrecognised enum " + input);
+			throw new WrongConsoleInputException("unrecognised token " + input +
+					" of type " + targetEnum.getName());
 		}
 		return returnValue;
 	}
@@ -53,45 +56,46 @@ public final class ParsingTools {
 	 * returns null if null specified.
 	 */
 	public static Long parseLong(String value)
-		throws IllegalArgumentException {
+		throws WrongConsoleInputException {
 		if (value == null) return null;
 		if (tryParseLong(value)) { 
 			return Long.parseLong(value); 
 		}
 		else { 
-			throw new IllegalArgumentException(value + " is not a number"); 
+			throw new WrongConsoleInputException(value + " is not a number"); 
 		}
 	}
 	
 	/**
 	 * Parses year/month/day notation into "Calendar" object.
 	 */
-	public static Date parseDate(String date) throws IllegalArgumentException{
+	public static Date parseDate(String date) 
+			throws WrongConsoleInputException {
 		if (date == null) return null;
-		
-		Date returnValue = new Date();
+		Date returnValue = null;
 		
 		String[] split = date.split("/");
 		if (split.length != 3)
-			throw new IllegalArgumentException("Wrong date format");
+			throw new WrongConsoleInputException("Wrong date format");
 		for(int i = 0; i < 3; i++) {
 			if (!tryParseLong(split[i]))
-				throw new IllegalArgumentException("Wrond date format");
+				throw new WrongConsoleInputException("Wrong date format");
 		}
 		
-		returnValue.setYear(Integer.parseInt(split[0]) - 1900);
-		returnValue.setMonth(Integer.parseInt(split[1]));
-		returnValue.setDate(Integer.parseInt(split[2]));
-		returnValue.setSeconds(0);
-		returnValue.setMinutes(0);
-		returnValue.setHours(0);
-		
+		try {
+			SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy/MM/dd'T'HH:mm:ss");
+	    	isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+	    	returnValue = isoFormat.parse(date + "T00:00:00");
+		} catch (ParseException pe) {
+			throw new WrongConsoleInputException("Wrong date format");
+		}
+	
 		return returnValue;
 	}
 	
 	public static List<ServiceAmountTuple> parseServices(String input,
 			InputController sender) 
-			throws IllegalArgumentException {
+				throws WrongConsoleInputException, InvalidArgumentException {
 		List<ServiceAmountTuple> returnValue = 
 				new ArrayList<ServiceAmountTuple>();
 		List<Object> searchResult;
@@ -102,7 +106,7 @@ public final class ParsingTools {
 			String[] split = input.split("/");
 			for(String service : split) {
 				if(!service.matches("[p][0-9]+[-][0-9]+")) {
-					throw new IllegalArgumentException("Wrong syntax at" 
+					throw new WrongConsoleInputException("Wrong syntax at" 
 								+ service);
 				}
 				serviceAmmount = service.substring(1).split("-");
@@ -112,7 +116,7 @@ public final class ParsingTools {
 				searchResult =
 						sender.modelOperation("GetByID dataType:Product ID:" + id);
 				if(searchResult.isEmpty()) {
-					throw new IllegalArgumentException("Service " + service + 
+					throw new WrongConsoleInputException("Service " + service + 
 							" not recognized");
 				}
 				

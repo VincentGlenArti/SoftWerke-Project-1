@@ -3,6 +3,7 @@ package controller.operations;
 import java.util.*;
 import model.data.datatypes.*;
 import model.storing.DataStorage;
+import exceptions.*;
 
 /**
  * An interface for operation.
@@ -10,9 +11,9 @@ import model.storing.DataStorage;
  * might would like to make one of those and add it to data storage info.
  * This will make this system recognize your operation automatically.
  * 
- * @version b.2
+ * @version b.3
  * @author	Boris Gordeev
- * @since 29-06-2015
+ * @since 02-07-2015
  */
 
 public interface IOperation {
@@ -28,6 +29,7 @@ public interface IOperation {
 	 * formated output.
 	 */
 	public List<Object> perform(DataType targetDataType,
-			DataStorage dataStorage, Map<String, Object> additionalParameters);
+			DataStorage dataStorage, Map<String, Object> additionalParameters)
+			throws InvalidArgumentException;
 	
 }

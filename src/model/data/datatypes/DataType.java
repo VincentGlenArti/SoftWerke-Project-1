@@ -9,12 +9,12 @@ import model.data.datatypes.factory.*;
  * to derive it from this one, implement it's abstract methods, 
  * and add a new enum for your type in DataTypeEnum.
  * 
- * @version b.2
+ * @version b.3
  * @author	Boris Gordeev
- * @since 29-06-2015
+ * @since 02-07-2015
  */
 
-public abstract class DataType {
+public abstract class DataType implements Comparable<DataType> {
 	
 	private Number id;
 	private Map<String, Object> propertiesAsMap;
@@ -37,7 +37,7 @@ public abstract class DataType {
 	 * to this.properties and ignores comparison of null values of
 	 * "comparableTo".
 	 */
-	public boolean ignoreNullEquals(DataType comparableTo) {
+	public boolean equalsIgnoringNullProperties(DataType comparableTo) {
 		boolean returnValue = true;
 		
 		if(!this.getType().equals(comparableTo.getType())) return false;
@@ -46,9 +46,10 @@ public abstract class DataType {
 					comparableToProperties = comparableTo.getPropertiesAsMap();
 		
 		for (String property : thisProperties.keySet()) {
-			returnValue = returnValue && ignoreNullEquality(
+			returnValue = returnValue && propertiesAreEqualIgnoringNull(
 					thisProperties.get(property),
 					comparableToProperties.get(property));
+			if (!returnValue) break;
 		}
 		
 		return returnValue;
@@ -120,7 +121,7 @@ public abstract class DataType {
 	 * Javadoc equality obliges to return false if object.equals(null)
 	 * is called. This one does otherwise.
 	 */
-	protected static boolean ignoreNullEquality(Object comparableFirst,
+	protected static boolean propertiesAreEqualIgnoringNull(Object comparableFirst,
 			Object comparableSecond) {
 		return (comparableSecond == null) ? 
 				true : comparableFirst.equals(comparableSecond);
@@ -140,6 +141,11 @@ public abstract class DataType {
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.getID());
+	}
+	
+	@Override
+	public int compareTo(DataType comparableTo) {
+		return ((Long)this.getID()).compareTo((Long)comparableTo.getID());
 	}
 
 }

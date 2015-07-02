@@ -5,13 +5,14 @@ import java.util.*;
 import model.data.auxiliary.*;
 import model.data.comparators.*;
 import model.data.datatypes.factory.*;
+import exceptions.*;
 
 /**
  * Data class for describing product.
  * 
- * @version b.2
+ * @version b.3
  * @author	Boris Gordeev
- * @since 29-06-2015
+ * @since 02-07-2015
  */
 
 public final class Product extends DataType implements IService {
@@ -63,14 +64,14 @@ public final class Product extends DataType implements IService {
 	public static Product getInstance(boolean generateID, 
 			Number manualID, String manufacturerName,
 			ProductType productType, String modelName, ColorDiscrete color,
-			Date releaseDate) throws IllegalArgumentException {
+			Date releaseDate) throws InvalidArgumentException {
 		if (generateID) {
 			if (manufacturerName == null ||
 					productType == null ||
 					modelName == null ||
 					color == null ||
 					releaseDate == null) {
-				throw new IllegalArgumentException("ID will be " +
+				throw new InvalidArgumentException("ID will be " +
 					"generated only if all required fields are not null");
 			}
 		}
@@ -81,6 +82,26 @@ public final class Product extends DataType implements IService {
 	}
 	
 	/**
+	 * Returns an empty instance, that can be used to access implementations
+	 * of abstract getters. Does not throw business logic exceptions.
+	 */
+	public static Product getEmptyInstance() {
+		Product returnValue;
+		try {
+			returnValue = getInstance(false,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null);
+		} catch (InvalidArgumentException iae) {
+			returnValue = null;
+		}
+		return returnValue;
+	}
+	
+	/**
 	 * Returns a map<key, value> object, where "key" is
 	 * supplied property name and "value" is supplied property value.
 	 */
@@ -88,14 +109,13 @@ public final class Product extends DataType implements IService {
 			final String manufacturerName, final ProductType productType,
 			final String modelName, final ColorDiscrete color, 
 			final Date releaseDate) {
-		return Collections.unmodifiableMap(
-			new HashMap<String, Object>(){{ 
-				put("manufacturerName", manufacturerName);
-				put("productType", productType);
-				put("modelName", modelName);
-				put("color", color);
-				put("releaseDate", releaseDate);
-		}});
+		Map<String, Object> returnValue = new HashMap<String, Object>();
+		returnValue.put("manufacturerName", manufacturerName);
+		returnValue.put("productType", productType);
+		returnValue.put("modelName", modelName);
+		returnValue.put("color", color);
+		returnValue.put("releaseDate", releaseDate);
+		return returnValue;
 	}
 	
 	public Date getReleaseDate() {

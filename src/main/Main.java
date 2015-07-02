@@ -1,16 +1,31 @@
 package main;
 
-import model.storing.DataStorage;
+import profiling.*;
+import model.storing.*;
+import controller.parsing.*;
 import view.ConsoleView;
-import controller.parsing.InputController;
+
+import java.text.ParseException;
+import java.util.*;
 
 public class Main {
 
 	public static void main(String[] args) {
-		DataStorage dataModel = new DataStorage();
-		InputController inputController = new InputController(dataModel);
-		ConsoleView view = new ConsoleView(inputController);
-		view.commandLineView();
+		
+		try {
+			List<String> result = Profiler.profileTestCase();
+			for(String resultString : result) {
+				System.out.println(resultString);
+			}
+		} catch (Exception pe) {
+			System.out.println("error");
+			System.out.println(pe.getMessage());
+		}
+		
+		/*DataStorage data = new DataStorage();
+		InputController controller = new InputController(data);
+		ConsoleView view = new ConsoleView(controller);
+		view.commandLineView();*/
 	}
 
 }

@@ -3,17 +3,17 @@ package model.data.datatypes.factory;
 import java.util.*;
 
 import controller.operations.*;
-import controller.parsing.InputController;
-import controller.parsing.ParsingTools;
+import controller.parsing.*;
 import model.data.auxiliary.*;
 import model.data.datatypes.*;
+import exceptions.*;
 
 /**
  * IFactory implementation for "Product" data type.
  * 
- * @version b.2
+ * @version b.3
  * @author	Boris Gordeev
- * @since 29-06-2015
+ * @since 02-07-2015
  */
 
 public class ProductFactory implements IFactory {
@@ -21,7 +21,7 @@ public class ProductFactory implements IFactory {
 	@Override
 	public DataType produce(Map<String, String> parameters, 
 			IOperation requiredOperation, InputController sender)
-			throws IllegalArgumentException {
+				throws WrongConsoleInputException, InvalidArgumentException {
 		boolean generateID = false;
 		if (requiredOperation.getType().equals(OperationEnum.Add)) {
 			generateID = true;

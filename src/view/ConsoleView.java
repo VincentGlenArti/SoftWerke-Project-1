@@ -1,5 +1,6 @@
 package view;
 
+import exceptions.*;
 import java.util.*;
 import java.io.*;
 
@@ -8,16 +9,12 @@ import controller.parsing.InputController;
 /**
  * Class used to accept user input and show back formated output.
  *
- * @version a.2
+ * @version b.3
  * @author	Boris Gordeev
- * @since 22-06-2015
+ * @since 02-07-2015
  */
 
 public class ConsoleView {
-	
-	private static String helpCommand = "-help";
-	private static String exitCommand = "-exit";
-	private static String userFrienldy = "-uf";
 	
 	private InputController controller;
 	
@@ -59,17 +56,17 @@ public class ConsoleView {
 	 */
 	private void sendInputToController(String commandLineInput) {
         List<Object> output = new ArrayList<Object>();
-        //try {
+        try {
         	output = controller.modelOperation(commandLineInput);
 	        for(int i = 0; i < output.size(); i++) {
 	        	System.out.println(output.get(i));
 	        }
         	System.out.println("Done!");
-        //} catch (IllegalArgumentException iae) {
-        	//System.out.println(iae.getMessage());
-        //} catch (Exception e) {
-        	//System.out.println("Unknown error");
-        //}
+        } catch (BusinessLogicException bl) {
+        	System.out.println(bl.getMessage());
+        } catch (Exception e) {
+        	System.out.println("Unknown error");
+        }
 	}
 	
 	/**
@@ -77,42 +74,42 @@ public class ConsoleView {
 	 */
 	private boolean interpretCommand(String commandLineInput) {
 		boolean continueWorking = true;
-		if (commandLineInput.equals(helpCommand)) {
+		
+		if (commandLineInput.equals("-help")) {
     		System.out.println("Syntax is as follows: " +
-    		"[operation] dataType:[type] [attributeType]:[attribute]" +
-    		System.lineSeparator() +
-    		"type -help to see this again or -exit to quit");
-    		System.out.println("-uf:[userID] will start user-friendly interface");
-    	} else if (commandLineInput.equals(exitCommand)) {
+    		"[operation] dataType:[type] [argumentName]:[value]");
+    		System.out.println("type -help to see this again or -exit to quit");
+    		System.out.println("type -dataType to see all datatypes");
+    		System.out.println("type -args [dataType] to see data type args");
+    		System.out.println("type -ops to see all operations");
+    		
+    	} else if (commandLineInput.equals("-exit")) {
     		continueWorking = false;
     		System.out.println("Goodbye");
-    	} else if (commandLineInput.startsWith(userFrienldy, 0)) {
-    		//userFriendlyView(commandLineInput);
-    		System.out.println("Back to console mode");
+    		
+    	} else if (commandLineInput.split(" ")[0].equals("-args")) {
+    		try {
+    			for(String parameter : controller.
+    				getDataTypeArgumentsNameList(commandLineInput)) {
+    					System.out.println(parameter);
+    			}
+    		} catch (BusinessLogicException bl) {
+    			System.out.println(bl.getMessage());
+    		}
+    		
+    	} else if (commandLineInput.equals("-ops")) {
+    		for(String operation : controller.getOperationsNameList()) {
+    			System.out.println(operation);
+    		}
+    		
+    	} else if (commandLineInput.equals("-dataType")) {
+    		for(String dataType : controller.getDataTypesNameList()) {
+    			System.out.println(dataType);
+    		}
+    		
     	} else {
     		System.out.println("Unknown command");
     	}
 		return continueWorking;
 	}
-	
-	/**
-	 * Finds user matching -uf request, and if it exists, initializes
-	 * UserFriendlyScenario class with it and sends control there.
-	 */
-	/*private void userFriendlyView(String commandLineInput) {
-		Client user = null;
-		try {
-			String[] split = commandLineInput.split(":");
-			String userSearch = "select dataType:clients id:" + split[1];
-			user = (Client)controller.modelOperation(userSearch).get(0);
-		} catch (Exception e) {
-			System.out.println("Wrong input");
-		}
-		
-		if (user != null) {
-			UserFriendlyScenario scenario = 
-					new UserFriendlyScenario(controller, user);
-			scenario.commenceScenario();
-		}
-	}*/
 }

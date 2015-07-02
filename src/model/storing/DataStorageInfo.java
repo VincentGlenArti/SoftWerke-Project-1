@@ -4,15 +4,16 @@ import java.util.*;
 
 import controller.operations.*;
 import model.data.datatypes.*;
+import exceptions.*;
 
 /**
  * Class for storing information about currently used by data storage
  * classes. Be aware that objects on both controller and model layer might
  * reference info stored there.
  * 
- * @version b.2
+ * @version b.3
  * @author	Boris Gordeev
- * @since 29-06-2015
+ * @since 02-07-2015
  */
 
 public final class DataStorageInfo {
@@ -24,17 +25,14 @@ public final class DataStorageInfo {
 	public static final Map<DataTypeEnum, DataType> dataTypesUsed =
 			Collections.unmodifiableMap(new EnumMap<DataTypeEnum, DataType> (
 					DataTypeEnum.class) {{
-						
 						put(DataTypeEnum.Client, 
-								Client.getInstance(false, null, null, null, null));
+								Client.getEmptyInstance());
 						
 						put(DataTypeEnum.Order, 
-								Order.getInstance(false, null, null, null, null));
+								Order.getEmptyInstance());
 						
 						put(DataTypeEnum.Product,
-								Product.getInstance(false, null, null, null, null,
-										null, null));
-						
+								Product.getEmptyInstance());
 					}});
 	
 	/**

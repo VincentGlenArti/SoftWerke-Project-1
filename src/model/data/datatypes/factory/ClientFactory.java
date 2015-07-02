@@ -6,13 +6,14 @@ import controller.operations.*;
 import controller.parsing.InputController;
 import controller.parsing.ParsingTools;
 import model.data.datatypes.*;
+import exceptions.*;
 
 /**
  * IFactory implementation for "Client" data type.
  * 
- * @version b.2
+ * @version b.3
  * @author	Boris Gordeev
- * @since 29-06-2015
+ * @since 02-07-2015
  */
 
 public class ClientFactory implements IFactory {
@@ -20,7 +21,7 @@ public class ClientFactory implements IFactory {
 	@Override
 	public DataType produce(Map <String, String> parameters, 
 			IOperation requiredOperation, InputController sender)
-			throws IllegalArgumentException {
+			throws WrongConsoleInputException, InvalidArgumentException {
 		boolean generateID = false;
 		if (requiredOperation.getType().equals(OperationEnum.Add)) {
 			generateID = true;

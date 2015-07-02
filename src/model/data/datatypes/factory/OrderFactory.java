@@ -5,14 +5,14 @@ import java.util.*;
 import controller.operations.*;
 import controller.parsing.*;
 import model.data.datatypes.*;
-import model.data.auxiliary.*;
+import exceptions.*;
 
 /**
  * IFactory implementation for "Order" data type.
  * 
- * @version b.2
+ * @version b.3
  * @author	Boris Gordeev
- * @since 29-06-2015
+ * @since 02-07-2015
  */
 
 public class OrderFactory implements IFactory {
@@ -20,7 +20,7 @@ public class OrderFactory implements IFactory {
 	@Override
 	public DataType produce(Map<String, String> parameters, 
 			IOperation requiredOperation, InputController sender)
-			throws IllegalArgumentException {
+					throws WrongConsoleInputException, InvalidArgumentException {
 		boolean generateID = false;
 		if (requiredOperation.getType().equals(OperationEnum.Add)) {
 			generateID = true;

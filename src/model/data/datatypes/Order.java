@@ -5,13 +5,14 @@ import java.util.*;
 import model.data.comparators.*;
 import model.data.datatypes.factory.*;
 import model.data.auxiliary.ServiceAmountTuple;
+import exceptions.*;
 
 /**
  * Data class for describing order.
  * 
- * @version b.2
+ * @version b.3
  * @author	Boris Gordeev
- * @since 29-06-2015
+ * @since 02-07-2015
  */
 
 public final class Order extends DataType {
@@ -53,12 +54,12 @@ public final class Order extends DataType {
 	public static Order getInstance(boolean generateID, 
 			Number manualID, Client client, 
 			Date dateTimeMade, List<ServiceAmountTuple> services) 
-					throws IllegalArgumentException {
+					throws InvalidArgumentException {
 		if (generateID) {
 			if (client == null ||
 					dateTimeMade == null ||
 					services == null) {
-				throw new IllegalArgumentException("ID will be " +
+				throw new InvalidArgumentException("ID will be " +
 					"generated only if all required fields are not null");
 			}
 		}
@@ -67,13 +68,30 @@ public final class Order extends DataType {
 		return new Order(generateID, manualID, client, dateTimeMade, services);
 	}
 	
+	/**
+	 * Returns an empty instance, that can be used to access implementations
+	 * of abstract getters. Does not throw business logic exceptions.
+	 */
+	public static Order getEmptyInstance() {
+		Order returnValue;
+		try {
+			returnValue = getInstance(false,
+					null,
+					null,
+					null,
+					null);
+		} catch (InvalidArgumentException iae) {
+			returnValue = null;
+		}
+		return returnValue;
+	}
+	
 	private final static Map<String, Object> setPropertiesAsMap(
 			final Date dateTimeMade, final DataType client) {
-		return Collections.unmodifiableMap(
-			new HashMap<String, Object>(){{ 
-				put("dateTimeMade", dateTimeMade);
-				put("client", client);
-		}});
+		Map<String, Object> returnValue = new HashMap<String, Object>();
+		returnValue.put("dateTimeMade", dateTimeMade);
+		returnValue.put("client", client);
+		return returnValue;
 	}
 
 	public List<ServiceAmountTuple> getServices() {

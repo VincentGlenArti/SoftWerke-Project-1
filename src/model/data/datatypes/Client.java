@@ -3,13 +3,14 @@ package model.data.datatypes;
 import java.util.*;
 import model.data.datatypes.factory.*;
 import model.data.comparators.*;
+import exceptions.*;
 
 /**
  * Data class for describing client.
  * 
- * @version b.2
+ * @version b.3
  * @author	Boris Gordeev
- * @since 29-06-2015
+ * @since 02-07-2015
  */
 
 public final class Client extends DataType {
@@ -49,17 +50,16 @@ public final class Client extends DataType {
 	 * if generateID is true but any input parameters besides manualID
 	 * are null, then an exception will be thrown.
 	 * 
-	 * @throws IllegalArgumentException
 	 */
 	public static Client getInstance(boolean generateID, 
 			String name, String lastName,
 			Date birthDate, Number manualID)
-			throws IllegalArgumentException {
+			throws InvalidArgumentException {
 		if (generateID) {
 			if (name == null ||
 					lastName == null ||
 					birthDate == null) {
-				throw new IllegalArgumentException("ID will be " +
+				throw new InvalidArgumentException("ID will be " +
 					"generated only if all required fields are not null");
 			}
 		}
@@ -69,17 +69,34 @@ public final class Client extends DataType {
 	}
 	
 	/**
+	 * Returns an empty instance, that can be used to access implementations
+	 * of abstract getters. Does not throw business logic exceptions.
+	 */
+	public static Client getEmptyInstance() {
+		Client returnValue;
+		try {
+			returnValue = getInstance(false,
+					null,
+					null,
+					null,
+					null);
+		} catch (InvalidArgumentException iae) {
+			returnValue = null;
+		}
+		return returnValue;
+	}
+	
+	/**
 	 * Returns a map<key, value> object, where "key" is
 	 * supplied property name and "value" is supplied property value.
 	 */
 	private final static Map<String, Object> setPropertiesAsMap(final String name, 
 			final String lastName, final Date birthDate) {
-		return Collections.unmodifiableMap(
-			new HashMap<String, Object>(){{ 
-				put("name", name);
-				put("lastName", lastName);
-				put("birthDate", birthDate);
-		}});
+		Map<String, Object> returnValue = new HashMap<String, Object>();
+		returnValue.put("name", name);
+		returnValue.put("lastName", lastName);
+		returnValue.put("birthDate", birthDate);
+		return returnValue;
 	}
 	
 	public Date getBirthDate() {
